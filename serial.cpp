@@ -73,7 +73,16 @@ void apply_force(particle_t& particle, particle_t& neighbor) {
     double r = sqrt(r2);
 
     // Very simple short-range repulsive force
-    double coef = (1 - cutoff / r) / r2 / mass;
+    // double coef = (1 - cutoff / r) / r2 / mass;
+
+    // Inverse sqrt
+    double r_inv = 1.0 / sqrt(r2);      // single sqrt
+    double r2_inv = r_inv * r_inv;      // no sqrt for r2
+    double cutoff_r = cutoff * r_inv;   // cutoff / r
+
+    // (1 - cutoff/r)/r^2 = (1 - cutoff_r)*r2_inv
+    double coef = (1.0 - cutoff_r) * r2_inv / mass;
+
     particle.ax += coef * dx;
     particle.ay += coef * dy;
 }
@@ -106,7 +115,7 @@ void init_simulation(particle_t* parts, int num_parts, double size) {
     // algorithm begins. Do not do any particle simulation here
 
     // Initialize bins
-    bins_per_side = ceil(size / (cutoff * 1.8));
+    bins_per_side = ceil(size / cutoff);
     bin_size = size / bins_per_side;
     num_bins = bins_per_side * bins_per_side;
     bin_size_reciprocal = 1.0 / bin_size;
