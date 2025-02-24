@@ -115,7 +115,7 @@ void init_simulation(particle_t* parts, int num_parts, double size) {
     // algorithm begins. Do not do any particle simulation here
 
     // Initialize bins
-    bins_per_side = ceil(size / cutoff);
+    bins_per_side = ceil(size / (cutoff * 1.2));
     bin_size = size / bins_per_side;
     num_bins = bins_per_side * bins_per_side;
     bin_size_reciprocal = 1.0 / bin_size;
