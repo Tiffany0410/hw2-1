@@ -3,6 +3,12 @@
 #include <cstring>
 
 // Global Variables
+typedef struct {            // structure to represent a bin
+    int neighbor_id[8];     // index ids of neighboring bins
+    int particle_id[5];     // index ids of particles in this bin
+    int num_neighbors;      // actual number of neighbors
+} bin_t;
+
 int bins_per_side;          // number of bins per side
 double bin_size;            // size of bin
 int num_bins;               // size of bin
@@ -72,15 +78,10 @@ void apply_force(particle_t& particle, particle_t& neighbor) {
     r2 = fmax(r2, min_r * min_r);
     double r = sqrt(r2);
 
-    // Very simple short-range repulsive force
-    // double coef = (1 - cutoff / r) / r2 / mass;
-
     // Inverse sqrt
     double r_inv = 1.0 / sqrt(r2);      // single sqrt
     double r2_inv = r_inv * r_inv;      // no sqrt for r2
     double cutoff_r = cutoff * r_inv;   // cutoff / r
-
-    // (1 - cutoff/r)/r^2 = (1 - cutoff_r)*r2_inv
     double coef = (1.0 - cutoff_r) * r2_inv / mass;
 
     particle.ax += coef * dx;
@@ -110,10 +111,6 @@ void move(particle_t& p, double size) {
 
 
 void init_simulation(particle_t* parts, int num_parts, double size) {
-	// You can use this space to initialize static, global data objects
-    // that you may need. This function will be called once before the
-    // algorithm begins. Do not do any particle simulation here
-
     // Initialize bins
     bins_per_side = ceil(size / (cutoff * 1.2));
     bin_size = size / bins_per_side;

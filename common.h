@@ -20,12 +20,6 @@ typedef struct particle_t {
     double ay; // Acceleration Y
 } particle_t;
 
-typedef struct {            // structure to represent a bin
-    int neighbor_id[8];     // index ids of neighboring bins
-    int particle_id[5];     // index ids of particles in this bin
-    int num_neighbors;      // actual number of neighbors
-} bin_t;
-
 // Simulation routine
 void init_simulation(particle_t* parts, int num_parts, double size);
 void simulate_one_step(particle_t* parts, int num_parts, double size);

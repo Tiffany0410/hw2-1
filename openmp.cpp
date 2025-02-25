@@ -7,6 +7,12 @@
 #include <string.h>
 
 // Put any static global variables here that you will use throughout the simulation.
+typedef struct {            // structure to represent a bin
+    int neighbor_id[8];     // index ids of neighboring bins
+    int particle_id[5];     // index ids of particles in this bin
+    int num_neighbors;      // actual number of neighbors
+} bin_t;
+
 // Global Variables
 int bins_per_side;          // number of bins per side
 double bin_size;            // size of bin
@@ -79,8 +85,12 @@ void apply_force(particle_t& particle, particle_t& neighbor) {
     r2 = fmax(r2, min_r * min_r);
     double r = sqrt(r2);
 
-    // Very simple short-range repulsive force
-    double coef = (1 - cutoff / r) / r2 / mass;
+    // Inverse sqrt
+    double r_inv = 1.0 / sqrt(r2);      // single sqrt
+    double r2_inv = r_inv * r_inv;      // no sqrt for r2
+    double cutoff_r = cutoff * r_inv;   // cutoff / r
+    double coef = (1.0 - cutoff_r) * r2_inv / mass;
+
     particle.ax += coef * dx;
     particle.ay += coef * dy;
 }
@@ -161,7 +171,7 @@ void simulate_one_step(particle_t* parts, int num_parts, double size) {
 	#pragma omp single
     memset(bin_num_particles, 0, num_bins * sizeof(int));
 
-	//  move particles
+	//  Move particles
 	#pragma omp for 
 	for( int i = 0; i < num_parts; i++ ) {
 		move( parts[i], size );
